@@ -5,55 +5,73 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Create uploads dir
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads');
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
 const storage = multer.diskStorage({
-  destination: 'uploads/',
-  filename: (req, file, cb) => {
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname);
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
+});
 
-// Mock users for demo (use real DB in production)
+// In-memory storage for demo
 let users = [];
 let videos = [];
 
 app.post('/register', (req, res) => {
   const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'اطلاعات ناقص' });
   users.push({ username, password });
-  res.json({ message: 'ثبت نام موفق' });
+  res.json({ success: true, message: 'ثبت نام با موفقیت انجام شد!' });
 });
 
 app.post('/login', (req, res) => {
-  // Simple auth for demo
-  res.json({ token: 'fake-jwt-token' });
+  const { username, password } = req.body;
+  res.json({ success: true, token: 'fake-jwt-' + Date.now(), message: 'لاگین موفق' });
 });
 
 app.post('/upload', upload.single('video'), (req, res) => {
-  if (!req.file) return res.status(400).send('No file');
+  if (!req.file) {
+    return res.status(400).json({ error: 'هیچ فایلی آپلود نشد' });
+  }
   const video = {
     id: Date.now(),
     filename: req.file.filename,
-    path: `/uploads/${req.file.filename}`,
-    title: req.body.title || 'Untitled'
+    url: `/uploads/${req.file.filename}`,
+    title: req.body.title || req.file.originalname,
+    uploadedAt: new Date()
   };
   videos.push(video);
-  res.json({ message: 'ویدئو آپلود شد', video });
+  res.json({ success: true, message: 'ویدئو با موفقیت آپلود شد!', video });
 });
 
 app.get('/videos', (req, res) => {
   res.json(videos);
 });
 
-app.use('/uploads', express.static('uploads'));
+// Serve uploaded files
+app.use('/uploads', express.static(uploadsDir));
+
+// Serve static frontend
+app.use(express.static(path.join(__dirname, '.')));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 سرور ماهان ویدئو روی پورت ${PORT} در حال اجراست!`);
+});

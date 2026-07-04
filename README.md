@@ -1,10 +1,16 @@
 # ماهان ویدئو
 
-## Backend Features
-- ثبت نام و لاگین
-- آپلود ویدئو واقعی
-- ذخیره در uploads/
+**Backend کامل با ثبت‌نام + آپلود واقعی**
 
-برای تولید: MongoDB + Cloud Storage (S3) اضافه کن.
+## نصب و اجرا:
+```bash
+npm install
+npm start
+```
 
-Run: `npm install && npm start`
+Frontend: index.html
+Backend: server.js
+
+**نکته:** برای GitHub Pages فقط frontend کار می‌کنه. برای بک‌اند کامل از Replit، Render، Railway یا VPS استفاده کن.
+
+خطاها رو رفع کردم!
