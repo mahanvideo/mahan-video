@@ -1,9 +1,10 @@
 # ماهان ویدئو
 
-سایت اشتراک گذاری ویدئو
+## Backend Features
+- ثبت نام و لاگین
+- آپلود ویدئو واقعی
+- ذخیره در uploads/
 
-## نحوه اجرا
-1. این repo را clone کنید
-2. index.html را در مرورگر باز کنید
+برای تولید: MongoDB + Cloud Storage (S3) اضافه کن.
 
-برای نسخه کامل، از GitHub Pages استفاده کنید: https://mahanvideo.github.io/mahan-video/
+Run: `npm install && npm start`
